@@ -4,7 +4,7 @@ automation: !include automations.yaml
 
 rest_command:
   n8n_ha_event:
-    url: "https://n8n.dmall.ink/webhook-test/ha-events"
+    url: "https://n8n.dmall.ink/webhook/ha-events"
     method: post
     headers:
       X-Homelab-Webhook: !secret n8n_ha_webhook_token
