@@ -1,0 +1,8 @@
+default_config:
+
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 172.30.0.0/24
+    - 127.0.0.1
+    - ::1

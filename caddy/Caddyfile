@@ -1,0 +1,32 @@
+{
+	email {$ACME_EMAIL}
+}
+
+{$BASE_DOMAIN} {
+	redir https://home.{$BASE_DOMAIN}{uri} permanent
+}
+
+home.{$BASE_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy homepage:3000
+}
+
+kuma.{$BASE_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy uptime-kuma:3001
+}
+
+beszel.{$BASE_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy beszel:8090
+}
+
+n8n.{$BASE_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy n8n:5678
+}
+
+ha.{$BASE_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy homeassistant:8123
+}

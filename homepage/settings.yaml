@@ -1,0 +1,17 @@
+title: Homelab
+theme: dark
+color: slate
+headerStyle: clean
+statusStyle: dot
+hideVersion: true
+showStats: true
+layout:
+  Infrastructure:
+    style: row
+    columns: 3
+  Automation:
+    style: row
+    columns: 3
+  Smart Home:
+    style: row
+    columns: 3

@@ -1,0 +1,130 @@
+name: ${COMPOSE_PROJECT_NAME:-homelab}
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: homelab-caddy
+    restart: unless-stopped
+    environment:
+      BASE_DOMAIN: ${BASE_DOMAIN:?Set BASE_DOMAIN in .env}
+      ACME_EMAIL: ${ACME_EMAIL:?Set ACME_EMAIL in .env}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./caddy/data:/data
+      - ./caddy/config:/config
+    networks:
+      - proxy
+    depends_on:
+      - homepage
+      - uptime-kuma
+      - beszel
+      - n8n
+      - homeassistant
+
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homelab-homepage
+    restart: unless-stopped
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: ${HOMEPAGE_ALLOWED_HOSTS:?Set HOMEPAGE_ALLOWED_HOSTS in .env}
+      HOMEPAGE_VAR_BASE_DOMAIN: ${BASE_DOMAIN:?Set BASE_DOMAIN in .env}
+    volumes:
+      - ./homepage:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - proxy
+
+  uptime-kuma:
+    image: louislam/uptime-kuma:1
+    container_name: homelab-uptime-kuma
+    restart: unless-stopped
+    volumes:
+      - ./uptime-kuma:/app/data
+    networks:
+      - proxy
+
+  beszel:
+    image: henrygd/beszel:latest
+    container_name: homelab-beszel
+    restart: unless-stopped
+    environment:
+      APP_URL: https://beszel.${BASE_DOMAIN:?Set BASE_DOMAIN in .env}
+    ports:
+      - "127.0.0.1:8090:8090"
+    volumes:
+      - ./beszel/data:/beszel_data
+      - ./beszel/socket:/beszel_socket
+    networks:
+      - proxy
+    healthcheck:
+      test: ["CMD", "/beszel", "health", "--url", "http://localhost:8090"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  beszel-agent:
+    image: henrygd/beszel-agent:latest
+    container_name: homelab-beszel-agent
+    restart: unless-stopped
+    profiles:
+      - beszel-agent
+    network_mode: host
+    volumes:
+      - ./beszel/agent:/var/lib/beszel-agent
+      - ./beszel/socket:/beszel_socket
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      LISTEN: /beszel_socket/beszel.sock
+      HUB_URL: http://127.0.0.1:8090
+      TOKEN: ${BESZEL_AGENT_TOKEN:?Set BESZEL_AGENT_TOKEN after creating the system in Beszel}
+      KEY: ${BESZEL_AGENT_KEY:?Set BESZEL_AGENT_KEY after creating the system in Beszel}
+    depends_on:
+      beszel:
+        condition: service_healthy
+
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: homelab-n8n
+    restart: unless-stopped
+    environment:
+      N8N_HOST: ${N8N_HOST:?Set N8N_HOST in .env}
+      N8N_PORT: 5678
+      N8N_PROTOCOL: https
+      NODE_ENV: production
+      WEBHOOK_URL: ${N8N_WEBHOOK_URL:?Set N8N_WEBHOOK_URL in .env}
+      N8N_EDITOR_BASE_URL: ${N8N_EDITOR_BASE_URL:?Set N8N_EDITOR_BASE_URL in .env}
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY:?Set N8N_ENCRYPTION_KEY in .env}
+      N8N_SECURE_COOKIE: "true"
+      N8N_DIAGNOSTICS_ENABLED: "false"
+      N8N_PERSONALIZATION_ENABLED: "false"
+      GENERIC_TIMEZONE: ${TZ:-Asia/Shanghai}
+      TZ: ${TZ:-Asia/Shanghai}
+    volumes:
+      - ./n8n:/home/node/.n8n
+      - ./n8n/files:/files
+    networks:
+      - proxy
+
+  homeassistant:
+    image: ghcr.io/home-assistant/home-assistant:stable
+    container_name: homelab-homeassistant
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Asia/Shanghai}
+    volumes:
+      - ./home-assistant:/config
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    name: homelab-proxy
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/24

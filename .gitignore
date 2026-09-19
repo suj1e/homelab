@@ -1,0 +1,25 @@
+# Secrets and local Compose environment
+.env
+
+# Caddy runtime state and certificates
+caddy/data/
+caddy/config/
+
+# Application runtime state
+uptime-kuma/*
+!uptime-kuma/.gitkeep
+beszel/data/
+beszel/agent/
+beszel/socket/
+n8n/*
+!n8n/files/
+!n8n/files/.gitkeep
+home-assistant/*
+!home-assistant/configuration.yaml
+!home-assistant/.gitkeep
+
+# Common local database, cache, and editor files
+**/*.db
+**/*.sqlite
+**/*.sqlite3
+.DS_Store

@@ -1,0 +1,34 @@
+- Infrastructure:
+    - Caddy:
+        icon: caddy.png
+        description: Reverse proxy and HTTPS
+        server: my-docker
+        container: homelab-caddy
+    - Uptime Kuma:
+        icon: uptime-kuma.png
+        href: https://kuma.{{HOMEPAGE_VAR_BASE_DOMAIN}}
+        description: Availability monitoring
+        server: my-docker
+        container: homelab-uptime-kuma
+    - Beszel:
+        icon: beszel.png
+        href: https://beszel.{{HOMEPAGE_VAR_BASE_DOMAIN}}
+        description: Server and container metrics
+        server: my-docker
+        container: homelab-beszel
+
+- Automation:
+    - n8n:
+        icon: n8n.png
+        href: https://n8n.{{HOMEPAGE_VAR_BASE_DOMAIN}}
+        description: Workflow automation
+        server: my-docker
+        container: homelab-n8n
+
+- Smart Home:
+    - Home Assistant:
+        icon: home-assistant.png
+        href: https://ha.{{HOMEPAGE_VAR_BASE_DOMAIN}}
+        description: Xiaomi Home and smart-home control
+        server: my-docker
+        container: homelab-homeassistant
