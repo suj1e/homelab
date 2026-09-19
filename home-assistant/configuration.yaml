@@ -1,5 +1,7 @@
 default_config:
 
+automation: !include automations.yaml
+
 rest_command:
   n8n_ha_event:
     url: "https://n8n.dmall.ink/webhook-test/ha-events"
