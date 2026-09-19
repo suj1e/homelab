@@ -1,1 +1,19 @@
 default_config:
+
+rest_command:
+  n8n_ha_event:
+    url: "https://n8n.dmall.ink/webhook-test/ha-events"
+    method: post
+    headers:
+      X-Homelab-Webhook: !secret n8n_ha_webhook_token
+    content_type: "application/json"
+    payload: >-
+      {{
+        {
+          "entity_id": trigger.entity_id,
+          "from_state": trigger.from_state.state if trigger.from_state else none,
+          "to_state": trigger.to_state.state if trigger.to_state else none,
+          "friendly_name": state_attr(trigger.entity_id, "friendly_name"),
+          "changed_at": now().isoformat()
+        } | to_json
+      }}
