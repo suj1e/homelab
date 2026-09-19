@@ -34,6 +34,8 @@ homelab/
 ├── uptime-kuma/
 ├── beszel/
 ├── n8n/
+├── scripts/
+│   └── install-xiaomi-home.sh
 └── home-assistant/
     └── configuration.yaml
 ```
@@ -108,6 +110,22 @@ Agent 使用宿主机网络和 Docker socket，用于采集阿里云服务器及
 ## Home Assistant 和 Xiaomi Home
 
 打开 `https://ha.<domain>`，完成 Home Assistant 初始化后：
+
+仓库提供了官方 Xiaomi Home 自定义集成的可重复安装脚本。首次安装或更新组件时，在仓库根目录执行：
+
+```bash
+bash scripts/install-xiaomi-home.sh
+docker compose restart homeassistant
+```
+
+脚本默认固定安装官方仓库的 `v0.4.7`。需要升级时，显式指定官方仓库中的版本：
+
+```bash
+XIAOMI_HOME_REF=v0.4.7 bash scripts/install-xiaomi-home.sh
+docker compose restart homeassistant
+```
+
+组件代码会安装到 Home Assistant 的运行目录，该目录已被 `.gitignore` 忽略；账号、OAuth token 和设备数据不会进入 Git。
 
 1. 进入 **Settings → Devices & services**。
 2. 选择 **Add Integration**。
