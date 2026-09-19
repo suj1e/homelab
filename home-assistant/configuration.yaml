@@ -12,10 +12,10 @@ rest_command:
     payload: >-
       {{
         {
-          "entity_id": trigger.entity_id,
-          "from_state": trigger.from_state.state if trigger.from_state else none,
-          "to_state": trigger.to_state.state if trigger.to_state else none,
-          "friendly_name": state_attr(trigger.entity_id, "friendly_name"),
-          "changed_at": now().isoformat()
+          "entity_id": entity_id,
+          "from_state": from_state,
+          "to_state": to_state,
+          "friendly_name": friendly_name,
+          "changed_at": changed_at
         } | to_json
       }}
