@@ -88,6 +88,29 @@ docker compose ps
 
 Caddy 会自动申请并续期 HTTPS 证书。第一次申请证书前，需要确保 DNS 已生效且 80/443 可以从公网访问。
 
+## n8n AI Assistant
+
+AI Assistant 的模型配置在 n8n 页面中完成；代码沙箱由同一个 Compose 项目中的内部服务提供。沙箱服务不会通过 Caddy、DNS 或公网端口暴露。
+
+在 `.env` 中配置以下值，并让 `N8N_SANDBOX_SERVICE_API_KEY` 与 `SANDBOX_API_KEYS` 完全一致：
+
+```dotenv
+N8N_SANDBOX_VERSION=latest
+N8N_SANDBOX_SERVICE_API_KEY=随机长密钥
+SANDBOX_API_KEYS=与上面相同的随机长密钥
+SANDBOX_API_RUNNER_REGISTRATION_TOKEN=随机长密钥
+SANDBOX_API_RUNNER_API_KEY=另一个随机长密钥
+```
+
+启动或更新后，在 n8n AI Assistant 设置中选择 **n8n Sandbox**，填写：
+
+```text
+Service URL: http://sandbox-api:8080
+API key: N8N_SANDBOX_SERVICE_API_KEY 的值
+```
+
+Sandbox Runner 使用 Docker-in-Docker 和特权容器，只允许内部 Compose 网络访问。2C4G 服务器达到官方建议的最低配置，运行代码沙箱时需要留意内存和磁盘使用情况。
+
 ## Beszel 初始化
 
 1. 打开 `https://beszel.<domain>`，创建 Hub 管理员账号。
